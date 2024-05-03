@@ -1,52 +1,32 @@
 from flask import Flask
 from flask import *
 
-
-
 app = Flask(__name__)
 
-# @app.route('/')
-# def home():
-#     return "First flask app"
+@app.route('/error')
+def error():
+    return "<p><strong>Enter correct password</strong></p>"
 
 
-# @app.route('/home/<name>')
-# def name(name):
-#     return "hello: " + name
+@app.route('/')
+def login():
+    return render_template('login.html')
 
-# @app.route('/age/<int:age>')
-# def age(age):
-#     return "Age = {}".format(age)
+@app.route('/success',methods=["POST"])
+def success():
+    if request.method == "POST":
+        username = request.form.get("user_name")
+        password = request.form.get("pass_word")
 
-# def about():
-#     return "This is about page"
-
-# app.add_url_rule("/about","about",about)
-
-
-@app.route('/admin')
-def admin():
-    return "This is admin page"
-
-@app.route('/library')
-def library():
-    return "This is libray page"
-
-@app.route("/student")
-def student():
-    return "This is Student Page"
+    if password == 'mphasis':
+        resp = make_response(render_template('success.html',username=username))
+        resp.set_cookie('username',username)
+        return resp
+    else:
+        return redirect(url_for('error'))
 
 
-@app.route("/user/<name>")
-def user(name):
-    if name == "admin":
-        return redirect(url_for('admin'))
-    if name == "library":
-        return redirect(url_for('library'))
-    if name == "student":
-        return redirect(url_for('student'))
-    
 
-if __name__ == '__main__':
+
+if __name__ =='__main__':
     app.run(debug=True)
-
