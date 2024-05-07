@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chatbot</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f0f0;
+        margin: 0;
+        padding: 0;
+      }
+
+      .container {
+        max-width: 600px;
+        margin: 50px auto;
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+      }
+
+      h1 {
+        text-align: center;
+        color: #333;
+      }
+
+      #conversation {
+        height: 300px;
+        overflow-y: auto;
+        border: 1px solid #ccc;
+        padding: 10px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+      }
+
+      form {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      input[type="text"] {
+        flex: 1;
+        padding: 10px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        margin-right: 10px;
+      }
+
+      button {
+        padding: 10px 20px;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background-color: #45a049;
+      }
+
+      .message {
+        padding: 5px;
+        margin-bottom: 5px;
+        border-radius: 5px;
+      }
+
+      .user-message {
+        background-color: #dff0d8;
+        text-align: right;
+      }
+
+      .bot-message {
+        background-color: #d9edf7;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Chatbot</h1>
+    <div id="conversation"></div>
+    <form id="chat-form">
+      <input type="text" id="user-message" placeholder="Type your message..." />
+      <button type="submit">Send</button>
+    </form>
+
+    <script>
+      const conversationDiv = document.getElementById("conversation");
+      const chatForm = document.getElementById("chat-form");
+      const userMessageInput = document.getElementById("user-message");
+
+      chatForm.addEventListener("submit", function (event) {
+        event.preventDefault();
+        const userMessage = userMessageInput.value;
+        addMessageToConversation("You", userMessage);
+        userMessageInput.value = "";
+        sendMessageToBot(userMessage);
+      });
+
+      function addMessageToConversation(sender, message) {
+        const messageElement = document.createElement("div");
+        messageElement.textContent = `${sender}: ${message}`;
+        conversationDiv.appendChild(messageElement);
+        conversationDiv.scrollTop = conversationDiv.scrollHeight;
+      }
+
+      function sendMessageToBot(userMessage) {
+        fetch("/chat", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: `user_message=${encodeURIComponent(userMessage)}`,
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            const botResponse = data.bot_response;
+            addMessageToConversation("Bot", botResponse);
+          })
+          .catch((error) => {
+            console.error("Error sending message to bot:", error);
+          });
+      }
+
+      // Load conversation history on page load
+      window.addEventListener("load", function () {
+        fetch("/conversation")
+          .then((response) => response.json())
+          .then((data) => {
+            data.forEach((entry) => {
+              addMessageToConversation(entry.sender, entry.message);
+            });
+          })
+          .catch((error) => {
+            console.error("Error loading conversation history:", error);
+          });
+      });
+    </script>
+  </body>
+</html>
