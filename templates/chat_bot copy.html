@@ -8,7 +8,7 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      background-color: #f9f9f9;
+      background-color: #f0f0f0;
       margin: 0;
       padding: 0;
     }
@@ -34,14 +34,12 @@
       padding: 10px;
       border-radius: 5px;
       margin-bottom: 20px;
-      background-color: #f6f6f6;
     }
 
     form {
       display: flex;
+      justify-content: space-between;
       align-items: center;
-      justify-content: center;
-      margin-top: 20px;
     }
 
     input[type="text"] {
@@ -50,7 +48,6 @@
       border-radius: 5px;
       border: 1px solid #ccc;
       margin-right: 10px;
-      font-size: 16px;
     }
 
     button {
@@ -60,7 +57,6 @@
       border: none;
       border-radius: 5px;
       cursor: pointer;
-      font-size: 16px;
     }
 
     button:hover {
@@ -68,34 +64,30 @@
     }
 
     .message {
-      padding: 10px;
-      margin-bottom: 10px;
+      padding: 5px;
+      margin-bottom: 5px;
       border-radius: 5px;
     }
 
     .user-message {
-      background-color: #4caf50;
-      color: white;
+      background-color: #dff0d8;
       text-align: right;
     }
 
     .bot-message {
-      background-color: #2196f3;
-      color: white;
+      background-color: #d9edf7;
     }
   </style>
 </head>
 
 <body>
 
-  <div class="container">
-    <h1>Chatbot</h1>
-    <div id="conversation"></div>
-    <form id="chat-form" action="/" method="post">
-      <input type="text" id="user-message" name="user_message" placeholder="Type your message...">
-      <button type="submit">Send</button>
-    </form>
-  </div>
+  <h1>Chatbot</h1>
+  <div id="conversation"></div>
+  <form id="chat-form" action="/" method="post">
+    <input type="text" id="user-message" name="user_message" placeholder="Type your message...">
+    <button type="submit">Send</button>
+  </form>
 
   <script>
     const conversationDiv = document.getElementById("conversation");
@@ -103,10 +95,9 @@
     const userMessageInput = document.getElementById("user-message");
 
     // Function to add a message to the conversation
-    function addMessageToConversation(sender, message, senderClass) {
+    function addMessageToConversation(sender, message) {
       const messageElement = document.createElement("div");
       messageElement.textContent = `${sender}: ${message}`;
-      messageElement.classList.add("message", senderClass);
       conversationDiv.appendChild(messageElement);
       conversationDiv.scrollTop = conversationDiv.scrollHeight;
     }
@@ -115,7 +106,7 @@
     chatForm.addEventListener("submit", function (event) {
       event.preventDefault();
       const userMessage = userMessageInput.value;
-      addMessageToConversation("You", userMessage, "user-message");
+      addMessageToConversation("You", userMessage);
       userMessageInput.value = "";
       sendMessageToBot(userMessage);
     });
@@ -133,7 +124,7 @@
         .then(response => response.json())
         .then(data => {
           const botResponse = data.bot_response;
-          addMessageToConversation("Bot", botResponse, "bot-message");
+          addMessageToConversation("Bot", botResponse);
         })
         .catch(error => {
           console.error('Error sending message to bot:', error);
